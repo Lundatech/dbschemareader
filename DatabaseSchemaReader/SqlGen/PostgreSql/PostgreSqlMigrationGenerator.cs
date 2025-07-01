@@ -149,14 +149,19 @@ namespace DatabaseSchemaReader.SqlGen.PostgreSql
         private static string AlterColumnDefaultValue(DatabaseColumn databaseColumn, DatabaseColumn originalColumn,
             string tableName, string columnName)
         {
+            var preQuote = "(";
+            var postQuote = ")";
+            if (databaseColumn.DataType != null && databaseColumn.DataType.IsString) {
+                preQuote += "'";
+                postQuote = "'" + postQuote;
+            }
+
             //set or drop default will also be a separate alter statement (if required)
             var setDefault = string.Empty;
             //defaultValue may be empty string- maybe just check null here??
             if (originalColumn == null && databaseColumn.DefaultValue != null)
             {
-                var defaultQuote = string.Empty;
-                if (databaseColumn.DataType != null && databaseColumn.DataType.IsString) defaultQuote = "'";
-                return $"ALTER TABLE {tableName} ALTER COLUMN {columnName} SET DEFAULT {defaultQuote}{databaseColumn.DefaultValue}{defaultQuote};";
+                return $"ALTER TABLE {tableName} ALTER COLUMN {columnName} SET DEFAULT {preQuote}{databaseColumn.DefaultValue}{postQuote};";
             }
 
             if (originalColumn != null && originalColumn.DefaultValue != databaseColumn.DefaultValue)
@@ -168,9 +173,7 @@ namespace DatabaseSchemaReader.SqlGen.PostgreSql
                 }
                 else
                 {
-                    var defaultQuote = string.Empty;
-                    if (databaseColumn.DataType != null && databaseColumn.DataType.IsString) defaultQuote = "'";
-                    setDefault = $"ALTER TABLE {tableName} ALTER COLUMN {columnName} SET DEFAULT {defaultQuote}{databaseColumn.DefaultValue}{defaultQuote};";
+                    setDefault = $"ALTER TABLE {tableName} ALTER COLUMN {columnName} SET DEFAULT {preQuote}{databaseColumn.DefaultValue}{postQuote};";
                 }
             }
 
