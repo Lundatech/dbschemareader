@@ -166,6 +166,14 @@ namespace DatabaseSchemaReader.SqlGen.PostgreSql
             return column.DataType.GetNetType() == typeof(bool);
         }
 
+        private static bool IsTimestampColumn(DatabaseColumn column) {
+            if (column.DataType == null) {
+                return string.Equals(column.DbDataType, "timestamp", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(column.DbDataType, "timestamptz", StringComparison.OrdinalIgnoreCase);
+            }
+            return column.DataType.GetNetType() == typeof(DateTime);
+        }
+
         private static string WriteDefaultValue(DatabaseColumn column)
         {
             const string defaultConstraint = " DEFAULT ";
@@ -203,6 +211,10 @@ namespace DatabaseSchemaReader.SqlGen.PostgreSql
                         break;
                 }
                 return defaultConstraint + defaultValue;
+            }
+
+            if (IsTimestampColumn(column)) {
+                return defaultConstraint + "(" + defaultValue + ")";
             }
 
             //numeric default
