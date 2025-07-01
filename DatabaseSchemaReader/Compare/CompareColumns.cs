@@ -51,7 +51,8 @@ namespace DatabaseSchemaReader.Compare
                     column.Length == match.Length &&
                     column.Precision == match.Precision &&
                     column.Scale == match.Scale &&
-                    column.Nullable == match.Nullable)
+                    column.Nullable == match.Nullable &&
+                    column.DefaultValue == match.DefaultValue)
                 {
                     //we don't check IDENTITY
                     continue; //the same, no action
