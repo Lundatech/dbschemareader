@@ -69,14 +69,14 @@ namespace DatabaseSchemaReader.Compare
         {
             var list = new List<CompareResult>();
 
+            //compare sequences
+            var compareSequences = new CompareSequences(list, _writer);
+            compareSequences.Execute(_baseSchema.Sequences, _compareSchema.Sequences);
+
             var compareTables = new CompareTables(list, _writer);
             //make sure they are in topological order- if 2 tables are added, the first must not have a foreign key to the second...
             var comparedTables = SchemaTablesSorter.TopologicalSort(_compareSchema);
             compareTables.Execute(_baseSchema.Tables, comparedTables);
-
-            //compare sequences
-            var compareSequences = new CompareSequences(list, _writer);
-            compareSequences.Execute(_baseSchema.Sequences, _compareSchema.Sequences);
 
             //compare views
             var compareViews = new CompareViews(list, _writer);
